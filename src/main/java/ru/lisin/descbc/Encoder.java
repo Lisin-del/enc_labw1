@@ -4,6 +4,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Encoder {
+    private final int secretKey = 90;
+    private final List<Byte> initializationVector = new ArrayList<>() {{
+        add((byte) 11);
+        add((byte) 2);
+        add((byte) 5);
+        add((byte) 14);
+        add((byte) 21);
+        add((byte) 13);
+        add((byte) 7);
+        add((byte) 54);
+    }};
 
     public List<List<Byte>> getBinaryBlocksToEncrypt(List<Byte> byteBlock) {
         int byteQuantity = 8; // because a block size is 64 bits
@@ -78,5 +89,57 @@ public class Encoder {
             add(leftByteBlock);
             add(rightByteBlock);
         }};
+    }
+
+    public List<List<Byte>> encrypt(List<List<Byte>> binaryBlocksToEncrypt) {
+        List<List<Byte>> completedEncryptedBlock = new ArrayList<>();
+
+        for (int i = 0; i < binaryBlocksToEncrypt.size(); ++i) {
+            List<Byte> encryptedBlockWithoutKey = new ArrayList<>();
+
+            if (i == 0) {
+                encryptedBlockWithoutKey.addAll(applyXORToBlocks(binaryBlocksToEncrypt.get(i), initializationVector));
+                completedEncryptedBlock.add(applyFFunction(encryptedBlockWithoutKey));
+            } else {
+                encryptedBlockWithoutKey.addAll(
+                        applyXORToBlocks(binaryBlocksToEncrypt.get(i), completedEncryptedBlock.get(i - 1))
+                );
+                completedEncryptedBlock.add(applyFFunction(encryptedBlockWithoutKey));
+            }
+        }
+
+        return completedEncryptedBlock;
+    }
+
+
+    public List<Byte> applyFFunction(List<Byte> inputEncryptedByteBlock) {
+        List<Byte> completedEncryptedBlock = new ArrayList<>();
+
+        for (Byte b : inputEncryptedByteBlock) {
+            int inputByteValue = b.intValue();
+            byte encryptedByte = (byte) (inputByteValue ^ secretKey);
+            completedEncryptedBlock.add(encryptedByte);
+        }
+
+        return completedEncryptedBlock;
+    }
+
+    public List<Byte> applyXORToBlocks(List<Byte> openByteBlock, List<Byte> encryptedByteBlock) {
+        if (openByteBlock.size() == encryptedByteBlock.size()) {
+            List<Byte> readyEncryptedBlock = new ArrayList<>();
+
+            for (int i = 0; i < openByteBlock.size(); ++i) {
+                int openByteIntValue = openByteBlock.get(i).intValue();
+                int encryptedByteIntValue = encryptedByteBlock.get(i).intValue();
+
+                byte finishingEncryptedByte = (byte) (openByteIntValue ^ encryptedByteIntValue);
+                readyEncryptedBlock.add(finishingEncryptedByte);
+            }
+
+            return readyEncryptedBlock;
+        } else {
+            System.out.println("ERROR: " + this.getClass() + "the block size is wrong");
+            return null;
+        }
     }
 }
