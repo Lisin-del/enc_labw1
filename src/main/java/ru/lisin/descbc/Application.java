@@ -5,14 +5,14 @@ import java.util.List;
 
 public class Application {
     public static void main(String[] args) {
-        String inputMessage = "Usual hello world message!!!";
+        String inputMessage = "01234567";
         Encoder encoder = new Encoder();
         List<List<Byte>> binaryBlocksToEncrypt = encoder.getBinaryBlocksToEncrypt(
                 encoder.byteArrayToList(inputMessage.getBytes())
         );
         List<List<Byte>> encryptedBlocks = encoder.encrypt(binaryBlocksToEncrypt);
 
-        StringBuilder stringBuilder = new StringBuilder();
+        StringBuilder unEncryptedMessageBuilder = new StringBuilder();
 
         for (List<Byte> block : binaryBlocksToEncrypt) {
             byte[] array = new byte[block.size()];
@@ -21,12 +21,12 @@ public class Application {
                 array[i] = b;
                 ++i;
             }
-            stringBuilder.append(new String(array));
+            unEncryptedMessageBuilder.append(new String(array));
         }
-        System.out.println(stringBuilder);
+        System.out.println(unEncryptedMessageBuilder);
         System.out.println("------------------------------");
 
-        StringBuilder stringBuilder1 = new StringBuilder();
+        StringBuilder encryptedMessageBuilder = new StringBuilder();
 
         for (List<Byte> block : encryptedBlocks) {
             byte[] array = new byte[block.size()];
@@ -35,16 +35,16 @@ public class Application {
                 array[i] = b;
                 ++i;
             }
-            stringBuilder1.append(new String(array));
+            encryptedMessageBuilder.append(new String(array));
         }
-        System.out.println(stringBuilder1);
+        System.out.println(encryptedMessageBuilder);
         System.out.println("------------------------------");
 
         Decoder decoder = new Decoder();
         List<List<Byte>> decryptedBlocks = decoder.decrypt(encryptedBlocks);
         Collections.reverse(decryptedBlocks);
 
-        StringBuilder stringBuilder2 = new StringBuilder();
+        StringBuilder decryptedMessageBuilder = new StringBuilder();
 
         for (List<Byte> block : decryptedBlocks) {
             byte[] array = new byte[block.size()];
@@ -53,9 +53,9 @@ public class Application {
                 array[i] = b;
                 ++i;
             }
-            stringBuilder2.append(new String(array));
+            decryptedMessageBuilder.append(new String(array));
         }
 
-        System.out.println(stringBuilder2);
+        System.out.println(decryptedMessageBuilder);
     }
 }

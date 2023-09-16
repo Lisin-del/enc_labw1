@@ -3,6 +3,9 @@ package ru.lisin.descbc;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Class that implements the encryption logic.
+ */
 public class Encoder {
     private final int secretKey = 90;
     private final List<Byte> initializationVector = new ArrayList<>() {{
@@ -16,6 +19,11 @@ public class Encoder {
         add((byte) 54);
     }};
 
+    /**
+     * Split an input byte block into equal blocks of 8 bytes.
+     * @param byteBlock is an input byte block.
+     * @return a list of blocks of 8 bytes.
+     */
     public List<List<Byte>> getBinaryBlocksToEncrypt(List<Byte> byteBlock) {
         int byteQuantity = 8; // because a block size is 64 bits
         List<List<Byte>> byteListToEncrypt = new ArrayList<>();
@@ -64,6 +72,11 @@ public class Encoder {
         return byteListToEncrypt;
     }
 
+    /**
+     * Converts a byte array to a list of bytes.
+     * @param byteBlock is an input array of bytes.
+     * @return a list of bytes.
+     */
     public List<Byte> byteArrayToList(byte[] byteBlock) {
         List<Byte> byteList = new ArrayList<Byte>();
         for (byte b : byteBlock) {
@@ -72,25 +85,11 @@ public class Encoder {
         return byteList;
     }
 
-    public List<List<Byte>> splitInputByteBlock(List<Byte> inputByteBlock) {
-        List<Byte> leftByteBlock = new ArrayList<>();
-        List<Byte> rightByteBlock = new ArrayList<>();
-        int inputByteBlockHalf = inputByteBlock.size() / 2;
-
-        for (int i = 0; i < inputByteBlockHalf; ++i) {
-            leftByteBlock.add(inputByteBlock.get(i));
-        }
-
-        for (int i = inputByteBlockHalf; i < inputByteBlock.size(); ++i) {
-            rightByteBlock.add(inputByteBlock.get(i));
-        }
-
-        return new ArrayList<>() {{
-            add(leftByteBlock);
-            add(rightByteBlock);
-        }};
-    }
-
+    /**
+     * Encrypts a list of binary blocks.
+     * @param binaryBlocksToEncrypt is a list of binary blocks to encrypt.
+     * @return an encrypted list of binary blocks.
+     */
     public List<List<Byte>> encrypt(List<List<Byte>> binaryBlocksToEncrypt) {
         List<List<Byte>> completedEncryptedBlock = new ArrayList<>();
 
@@ -111,7 +110,11 @@ public class Encoder {
         return completedEncryptedBlock;
     }
 
-
+    /**
+     * Applies the F function (XOR with the secret key) to an input encrypted byte block.
+     * @param inputEncryptedByteBlock is an input encrypted byte block.
+     * @return a result encrypted list of bytes with the applied secret key with (XOR).
+     */
     public List<Byte> applyFFunction(List<Byte> inputEncryptedByteBlock) {
         List<Byte> completedEncryptedBlock = new ArrayList<>();
 
@@ -124,6 +127,12 @@ public class Encoder {
         return completedEncryptedBlock;
     }
 
+    /**
+     * Applies the XOR operation for 2 byte blocks.
+     * @param openByteBlock is an unencrypted byte block.
+     * @param encryptedByteBlock is an encrypted byte block.
+     * @return a result list of encrypted bytes.
+     */
     public List<Byte> applyXORToBlocks(List<Byte> openByteBlock, List<Byte> encryptedByteBlock) {
         if (openByteBlock.size() == encryptedByteBlock.size()) {
             List<Byte> readyEncryptedBlock = new ArrayList<>();
