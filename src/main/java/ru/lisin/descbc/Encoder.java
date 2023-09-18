@@ -7,7 +7,8 @@ import java.util.List;
  * Class that implements the encryption logic.
  */
 public class Encoder {
-    private final int secretKey = 90;
+//    private final int secretKey = 90;
+    private final String secretKeyS = "dfj34m.#";
     private final List<Byte> initializationVector = new ArrayList<>() {{
         add((byte) 11);
         add((byte) 2);
@@ -118,9 +119,9 @@ public class Encoder {
     public List<Byte> applyFFunction(List<Byte> inputEncryptedByteBlock) {
         List<Byte> completedEncryptedBlock = new ArrayList<>();
 
-        for (Byte b : inputEncryptedByteBlock) {
-            int inputByteValue = b.intValue();
-            byte encryptedByte = (byte) (inputByteValue ^ secretKey);
+        for (int i = 0; i < inputEncryptedByteBlock.size(); ++i) {
+            int inputByteValue = inputEncryptedByteBlock.get(i).intValue();
+            byte encryptedByte = (byte) (inputByteValue ^ secretKeyS.getBytes()[i]);
             completedEncryptedBlock.add(encryptedByte);
         }
 

@@ -1,11 +1,12 @@
 package ru.lisin.descbc;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 public class Application {
     public static void main(String[] args) {
-        String inputMessage = "01234567";
+        String inputMessage = "New Secret Key Test";
         Encoder encoder = new Encoder();
         List<List<Byte>> binaryBlocksToEncrypt = encoder.getBinaryBlocksToEncrypt(
                 encoder.byteArrayToList(inputMessage.getBytes())
