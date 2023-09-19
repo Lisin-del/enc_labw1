@@ -1,12 +1,11 @@
 package ru.lisin.descbc;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 public class Application {
     public static void main(String[] args) {
-        String inputMessage = "New Secret Key Test";
+        String inputMessage = "Lisin Maxim Mikhailovich";
         Encoder encoder = new Encoder();
         List<List<Byte>> binaryBlocksToEncrypt = encoder.getBinaryBlocksToEncrypt(
                 encoder.byteArrayToList(inputMessage.getBytes())
@@ -22,7 +21,7 @@ public class Application {
                 array[i] = b;
                 ++i;
             }
-            unEncryptedMessageBuilder.append(new String(array));
+            unEncryptedMessageBuilder.append(new String(array).replace("0", ""));
         }
         System.out.println(unEncryptedMessageBuilder);
         System.out.println("------------------------------");
@@ -54,7 +53,7 @@ public class Application {
                 array[i] = b;
                 ++i;
             }
-            decryptedMessageBuilder.append(new String(array));
+            decryptedMessageBuilder.append(new String(array).replace("0", ""));
         }
 
         System.out.println(decryptedMessageBuilder);
