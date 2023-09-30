@@ -5,7 +5,7 @@ import java.util.List;
 
 public class Application {
     public static void main(String[] args) {
-        String inputMessage = "Lisin Maxim Mikhailovich";
+        String inputMessage = "This is a new test message to test my new approach of secret key generation";
         Encoder encoder = new Encoder();
         List<List<Byte>> binaryBlocksToEncrypt = encoder.getBinaryBlocksToEncrypt(
                 encoder.byteArrayToList(inputMessage.getBytes())

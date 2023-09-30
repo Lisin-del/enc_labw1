@@ -7,8 +7,7 @@ import java.util.List;
  * Class that implements the encryption logic.
  */
 public class Encoder {
-//    private final int secretKey = 90;
-    private final String secretKeyS = "dfj34m.#";
+    private final String secretKey = "dfj34m.#";
     private final List<Byte> initializationVector = new ArrayList<>() {{
         add((byte) 11);
         add((byte) 2);
@@ -19,6 +18,26 @@ public class Encoder {
         add((byte) 7);
         add((byte) 54);
     }};
+    private List<String> secretKeys = new ArrayList<>();
+
+    private void generateSecretKeys(int blockQuantity) {
+        for (int i = 0; i < blockQuantity; ++i) {
+            byte[] mainSecretKeyBytes = secretKey.getBytes();
+            List<Byte> newIntermediateGeneratedKey = new ArrayList<>();
+
+            for (int j = 0; j < mainSecretKeyBytes.length; ++j) {
+                byte movedByte = (byte) (mainSecretKeyBytes[j] << (j + i));
+                newIntermediateGeneratedKey.add((byte) (movedByte ^ (1457 * i)));
+            }
+
+            byte[] generatedKey = new byte[newIntermediateGeneratedKey.size()];
+            for (int j = 0; j < newIntermediateGeneratedKey.size(); ++j) {
+                generatedKey[j] = newIntermediateGeneratedKey.get(j);
+            }
+
+            secretKeys.add(new String(generatedKey));
+        }
+    }
 
     /**
      * Split an input byte block into equal blocks of 8 bytes.
@@ -94,17 +113,19 @@ public class Encoder {
     public List<List<Byte>> encrypt(List<List<Byte>> binaryBlocksToEncrypt) {
         List<List<Byte>> completedEncryptedBlock = new ArrayList<>();
 
+        generateSecretKeys(binaryBlocksToEncrypt.size());
+
         for (int i = 0; i < binaryBlocksToEncrypt.size(); ++i) {
             List<Byte> encryptedBlockWithoutKey = new ArrayList<>();
 
             if (i == 0) {
                 encryptedBlockWithoutKey.addAll(applyXORToBlocks(binaryBlocksToEncrypt.get(i), initializationVector));
-                completedEncryptedBlock.add(applyFFunction(encryptedBlockWithoutKey));
+                completedEncryptedBlock.add(applyFFunction(encryptedBlockWithoutKey, secretKeys.get(i)));
             } else {
                 encryptedBlockWithoutKey.addAll(
                         applyXORToBlocks(binaryBlocksToEncrypt.get(i), completedEncryptedBlock.get(i - 1))
                 );
-                completedEncryptedBlock.add(applyFFunction(encryptedBlockWithoutKey));
+                completedEncryptedBlock.add(applyFFunction(encryptedBlockWithoutKey, secretKeys.get(i)));
             }
         }
 
@@ -116,12 +137,12 @@ public class Encoder {
      * @param inputEncryptedByteBlock is an input encrypted byte block.
      * @return a result encrypted list of bytes with the applied secret key with (XOR).
      */
-    public List<Byte> applyFFunction(List<Byte> inputEncryptedByteBlock) {
+    public List<Byte> applyFFunction(List<Byte> inputEncryptedByteBlock, String inputSecretKey) {
         List<Byte> completedEncryptedBlock = new ArrayList<>();
 
         for (int i = 0; i < inputEncryptedByteBlock.size(); ++i) {
             int inputByteValue = inputEncryptedByteBlock.get(i).intValue();
-            byte encryptedByte = (byte) (inputByteValue ^ secretKeyS.getBytes()[i]);
+            byte encryptedByte = (byte) (inputByteValue ^ inputSecretKey.getBytes()[i]);
             completedEncryptedBlock.add(encryptedByte);
         }
 

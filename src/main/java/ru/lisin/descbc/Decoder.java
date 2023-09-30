@@ -5,8 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class Decoder {
-//    private final int secretKey = 90;
-    private final String secretKeyS = "dfj34m.#";
+    private final String secretKey = "dfj34m.#";
     private final List<Byte> initializationVector = new ArrayList<>() {{
         add((byte) 11);
         add((byte) 2);
@@ -17,6 +16,26 @@ public class Decoder {
         add((byte) 7);
         add((byte) 54);
     }};
+    private List<String> secretKeys = new ArrayList<>();
+
+    private void generateSecretKeys(int blockQuantity) {
+        for (int i = 0; i < blockQuantity; ++i) {
+            byte[] mainSecretKeyBytes = secretKey.getBytes();
+            List<Byte> newIntermediateGeneratedKey = new ArrayList<>();
+
+            for (int j = 0; j < mainSecretKeyBytes.length; ++j) {
+                byte movedByte = (byte) (mainSecretKeyBytes[j] << (j + i));
+                newIntermediateGeneratedKey.add((byte) (movedByte ^ (1457 * i)));
+            }
+
+            byte[] generatedKey = new byte[newIntermediateGeneratedKey.size()];
+            for (int j = 0; j < newIntermediateGeneratedKey.size(); ++j) {
+                generatedKey[j] = newIntermediateGeneratedKey.get(j);
+            }
+
+            secretKeys.add(new String(generatedKey));
+        }
+    }
 
     /**
      * Decrypts an input binary blocks.
@@ -24,11 +43,13 @@ public class Decoder {
      * @return a list of decrypted binary blocks.
      */
     public List<List<Byte>> decrypt(List<List<Byte>> binaryBlocksToDecrypt) {
+        generateSecretKeys(binaryBlocksToDecrypt.size());
+        Collections.reverse(secretKeys);
         Collections.reverse(binaryBlocksToDecrypt);
         List<List<Byte>> completedDecryptedBlock = new ArrayList<>();
 
         for (int i = 0; i < binaryBlocksToDecrypt.size(); ++i) {
-            List<Byte> decryptedWithKey = applyFFunction(binaryBlocksToDecrypt.get(i));
+            List<Byte> decryptedWithKey = applyFFunction(binaryBlocksToDecrypt.get(i), secretKeys.get(i));
             if ((i + 1) < binaryBlocksToDecrypt.size()) {
                 completedDecryptedBlock.add(applyXORToBlocks(decryptedWithKey, binaryBlocksToDecrypt.get(i + 1)));
             } else {
@@ -44,12 +65,12 @@ public class Decoder {
      * @param inputEncryptedByteBlock is an input encrypted byte block.
      * @return a result decrypted list of bytes with the applied secret key with (XOR).
      */
-    public List<Byte> applyFFunction(List<Byte> inputEncryptedByteBlock) {
+    public List<Byte> applyFFunction(List<Byte> inputEncryptedByteBlock, String inputSecretKey) {
         List<Byte> completedEncryptedBlock = new ArrayList<>();
 
         for (int i = 0; i < inputEncryptedByteBlock.size(); ++i) {
             int inputByteValue = inputEncryptedByteBlock.get(i).intValue();
-            byte encryptedByte = (byte) (inputByteValue ^ secretKeyS.getBytes()[i]);
+            byte encryptedByte = (byte) (inputByteValue ^ inputSecretKey.getBytes()[i]);
             completedEncryptedBlock.add(encryptedByte);
         }
 
